@@ -9,7 +9,7 @@ import "https://github.com/Block-Star-Logic/open-roles/blob/fc410fe170ac2d608ea5
 import "https://github.com/Block-Star-Logic/open-roles/blob/e7813857f186df0043c84f0cca42478584abe09c/blockchain_ethereum/solidity/v2/contracts/core/OpenRolesSecure.sol";
 import "https://github.com/Block-Star-Logic/open-register/blob/03fb07e69bfdfaa6a396a063988034de65bdab3d/blockchain_ethereum/solidity/V1/interfaces/IOpenRegister.sol";
 
-import "https://github.com/Block-Star-Logic/open-ranking/blob/7c619870350c6c77db6603e88da7749bf9ea455f/blockchain_ethereum/solidity/V1/interfaces/IOpenRanking.sol";
+import "https://github.com/Block-Star-Logic/open-ranking/blob/0e468d4680147bbb71c01bdeae1e799d96ff62db/blockchain_ethereum/solidity/V1/interfaces/IOpenRanking.sol";
 import "https://github.com/Block-Star-Logic/open-ranking/blob/7c619870350c6c77db6603e88da7749bf9ea455f/blockchain_ethereum/solidity/V1/libraries/LRankingUtilities.sol";
 
 
@@ -19,7 +19,7 @@ contract OpenRanking is IOpenRanking, OpenRolesSecure, IOpenRolesManaged {
     using LOpenUtilities for address; 
 
     string name                         = "RESERVED_OPEN_RANKING_CORE"; 
-    uint256 version                     = 3; 
+    uint256 version                     = 4; 
 
     string registerCA                   = "RESERVED_OPEN_REGISTER";
     string roleManagerCA                = "RESERVED_OPEN_ROLES";
@@ -94,7 +94,7 @@ contract OpenRanking is IOpenRanking, OpenRolesSecure, IOpenRolesManaged {
         return rankedAddressesByListName[_rankingListName].length; 
     }
 
-    function removeRankedAddress(address _address) external returns (bool _removed) {
+    function removeRankedAddress(address _address) override external returns (bool _removed) {
         require(isSecure(openAdminRole, "removeRankedAddress")," admin only ");
         string [] memory lists_ = listsByAddress[_address];
         for(uint256 x = 0; x < lists_.length; x++){
