@@ -10,4 +10,5 @@ interface IOpenRanking {
 
     function getRanking(string memory _rankingList, uint256 _limit) view external returns (address[] memory _rankedAddresses);
 
+    function removeRankedAddress(address _address) external returns (bool _removed);
 }
