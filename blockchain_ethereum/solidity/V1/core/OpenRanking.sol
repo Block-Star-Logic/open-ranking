@@ -19,10 +19,10 @@ contract OpenRanking is IOpenRanking, OpenRolesSecure, IOpenRolesManaged {
     using LOpenUtilities for address; 
 
     string name                         = "RESERVED_OPEN_RANKING_CORE"; 
-    uint256 version                     = 4; 
+    uint256 version                     = 5; 
 
-    string registerCA                   = "RESERVED_OPEN_REGISTER";
-    string roleManagerCA                = "RESERVED_OPEN_ROLES";
+    string registerCA                   = "RESERVED_OPEN_REGISTER_CORE";
+    string roleManagerCA                = "RESERVED_OPEN_ROLES_CORE";
 
     string openAdminRole                = "OPEN_ADMIN_ROLE";
 
