@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity >=0.8.0 <0.9.0;
+pragma solidity ^0.8.15;
 
 import "../interfaces/IOpenRankSortable.sol";
 
@@ -8,43 +8,42 @@ library LRankingUtilities {
 
     function rank(address a, address [] memory rankingList ) view internal returns (address [] memory _rankedList){
         
-        uint256 size = rankingList.length+1;
-        _rankedList = new address[](size);
+        uint256 size_ = rankingList.length + 1;
+        uint256 end_ = rankingList.length - 1; 
+        _rankedList = new address[](size_); 
 
         IOpenRankSortable sortable = IOpenRankSortable(a); 
-        uint256 index = rankingList.length; 
         
-        // find index        
+        // find index
+        bool shiftDown = false;       
+        uint256 y = 0;
         for(uint256 x = 0; x < rankingList.length; x++ ) {
-
-            int result = sortable.compare(rankingList[x]);
-    
-            if(result == 1 ){ // if greater take the position
-                index = assignIndex(index, x);
-            }
-            if(result == 0){ // if equal 
-                index = assignIndex(index, x+1); 
-            }
-            if(result == -1){
-                // do nothing 
-            }
-        }
-
-        bool indexAssigned = false; 
-        for(uint256 z = 0; z < _rankedList.length; z++ ) {
-            if(z == index){
-                _rankedList[z] = a; 
-                indexAssigned = true; 
-            }
-            else {
-                if(indexAssigned) {
-                    _rankedList[z] = rankingList[z-1];
+            address b = rankingList[x];
+            
+            if(!shiftDown) {
+                int result = sortable.compare(b);            
+                if(result == 1 ){ // if greater take the position                
+                    _rankedList[y] = a;
+                    y++;
+                    shiftDown = true;               
                 }
-                else {
-                    _rankedList[z] = rankingList[z];
+                
+                if(result == 0){ // if equal 
+                    _rankedList[y] = a;
+                    y++;
+                    shiftDown = true; 
+                }
+                if(result == -1){
+                    // do nothing                        
                 }
             }
+            _rankedList[y] = b;
+            y++;
+            if( x == end_ && !shiftDown ){
+                _rankedList[y++] = a;
+            }         
         }
+         return (_rankedList);       
     }
 
     function assignIndex(uint256 _oldIndex, uint256 _newIndex) pure internal returns (uint256 _assignedIndex){

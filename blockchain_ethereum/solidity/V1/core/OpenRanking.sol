@@ -4,14 +4,20 @@ pragma solidity ^0.8.14;
 /**
  * @dev IOpenRanking is about ranking addresses of interest. 
  */
-import "https://github.com/Block-Star-Logic/open-roles/blob/732f4f476d87bece7e53bd0873076771e90da7d5/blockchain_ethereum/solidity/v2/contracts/interfaces/IOpenRolesManaged.sol";
+// import "https://github.com/Block-Star-Logic/open-roles/blob/732f4f476d87bece7e53bd0873076771e90da7d5/blockchain_ethereum/solidity/v2/contracts/interfaces/IOpenRolesManaged.sol";
+import "../../../../../../Block-Star-Logic/open-roles/blockchain_ethereum/solidity/v2/contracts/interfaces/IOpenRolesManaged.sol";
 
-import "https://github.com/Block-Star-Logic/open-roles/blob/732f4f476d87bece7e53bd0873076771e90da7d5/blockchain_ethereum/solidity/v2/contracts/core/OpenRolesSecureCore.sol";
-import "https://github.com/Block-Star-Logic/open-register/blob/03fb07e69bfdfaa6a396a063988034de65bdab3d/blockchain_ethereum/solidity/V1/interfaces/IOpenRegister.sol";
+// import "https://github.com/Block-Star-Logic/open-roles/blob/732f4f476d87bece7e53bd0873076771e90da7d5/blockchain_ethereum/solidity/v2/contracts/core/OpenRolesSecureCore.sol";
+import "../../../../../../Block-Star-Logic/open-roles/blockchain_ethereum/solidity/v2/contracts/core/OpenRolesSecureCore.sol";
 
-import "https://github.com/Block-Star-Logic/open-ranking/blob/0e468d4680147bbb71c01bdeae1e799d96ff62db/blockchain_ethereum/solidity/V1/interfaces/IOpenRanking.sol";
-import "https://github.com/Block-Star-Logic/open-ranking/blob/7c619870350c6c77db6603e88da7749bf9ea455f/blockchain_ethereum/solidity/V1/libraries/LRankingUtilities.sol";
+// import "https://github.com/Block-Star-Logic/open-register/blob/03fb07e69bfdfaa6a396a063988034de65bdab3d/blockchain_ethereum/solidity/V1/interfaces/IOpenRegister.sol";
+import "../../../../../../Block-Star-Logic/open-register/blockchain_ethereum/solidity/V1/interfaces/IOpenRegister.sol";
 
+// import "https://github.com/Block-Star-Logic/open-ranking/blob/0e468d4680147bbb71c01bdeae1e799d96ff62db/blockchain_ethereum/solidity/V1/interfaces/IOpenRanking.sol";
+import "../../../../../../Block-Star-Logic/open-ranking/blockchain_ethereum/solidity/V1/interfaces/IOpenRanking.sol";
+
+// import "https://github.com/Block-Star-Logic/open-ranking/blob/7c619870350c6c77db6603e88da7749bf9ea455f/blockchain_ethereum/solidity/V1/libraries/LRankingUtilities.sol";
+import "../../../../../../Block-Star-Logic/open-ranking/blockchain_ethereum/solidity/V1/libraries/LRankingUtilities.sol";
 
 contract OpenRanking is IOpenRanking, OpenRolesSecureCore, IOpenVersion,  IOpenRolesManaged {
 
@@ -19,7 +25,7 @@ contract OpenRanking is IOpenRanking, OpenRolesSecureCore, IOpenVersion,  IOpenR
     using LOpenUtilities for address; 
 
     string name                         = "RESERVED_OPEN_RANKING_CORE"; 
-    uint256 version                     = 6; 
+    uint256 version                     = 11; 
 
     string registerCA                   = "RESERVED_OPEN_REGISTER_CORE";
     string roleManagerCA                = "RESERVED_OPEN_ROLES_CORE";
@@ -40,6 +46,7 @@ contract OpenRanking is IOpenRanking, OpenRolesSecureCore, IOpenVersion,  IOpenR
 
     mapping(address=>string[]) listsByAddress; 
     mapping(address=>mapping(string=>bool)) onListByAddress; 
+    mapping(string=>bool) knownList; 
 
      constructor(address _registryAddress, string memory _dappName) OpenRolesSecureCore(_dappName) {         
        registryAddress = _registryAddress;   
@@ -47,6 +54,7 @@ contract OpenRanking is IOpenRanking, OpenRolesSecureCore, IOpenVersion,  IOpenR
         setRoleManager(registry.getAddress(roleManagerCA));
         addConfigurationItem(address(registry));
         addConfigurationItem(address(roleManager));
+        initJobCryptFunctionsForRoles();
     }
 
     function getVersion() override view external returns (uint256 _version){
@@ -81,21 +89,32 @@ contract OpenRanking is IOpenRanking, OpenRolesSecureCore, IOpenVersion,  IOpenR
         }
         return _rankedAddresses; 
     }
+
     function addAddressToRank(address _address, string memory _rankingListName) override external returns (uint256 _listCount){
-        require(isSecure(dappCoreRole, "addAddressToRank")," dapp admin only ");  
+        require(isSecure(dappCoreRole, "addAddressToRank")," dapp core only ");  
+        if(!knownList[_rankingListName]){
+           rankedAddressesByListName[_rankingListName] = new address[](0);
+           knownList[_rankingListName] = true; 
+        }
         if(onListByAddress[_address][_rankingListName]) {
             rankedAddressesByListName[_rankingListName] = _address.remove(rankedAddressesByListName[_rankingListName]);
             delete onListByAddress[_address][_rankingListName]; 
         }
-        address [] memory _list = rankedAddressesByListName[_rankingListName];        
-        rankedAddressesByListName[_rankingListName] = _address.rank(_list);
-        onListByAddress[_address][_rankingListName] = true; 
+        address [] memory _list = rankedAddressesByListName[_rankingListName];   
+        
+        if(_list.length > 0){
+            rankedAddressesByListName[_rankingListName] = _address.rank(_list);            
+        }
+        else {
+            rankedAddressesByListName[_rankingListName].push(_address);            
+        }
         listsByAddress[_address].push(_rankingListName);
+        onListByAddress[_address][_rankingListName] = true; 
         return rankedAddressesByListName[_rankingListName].length; 
     }
 
     function removeRankedAddress(address _address) override external returns (bool _removed) {
-        require(isSecure(dappCoreRole, "removeRankedAddress")," dapp admin only ");
+        require(isSecure(dappCoreRole, "removeRankedAddress")," dapp core only ");
         string [] memory lists_ = listsByAddress[_address];
         for(uint256 x = 0; x < lists_.length; x++){
             string memory list_ = lists_[x];
@@ -123,7 +142,7 @@ contract OpenRanking is IOpenRanking, OpenRolesSecureCore, IOpenVersion,  IOpenR
         defaultFunctionsByRole[openAdminRole].push("notifyChangeOfAddress");
        
 
-        hasDefaultFunctionsByRole[openAdminRole] = true; 
+        hasDefaultFunctionsByRole[dappCoreRole] = true; 
         defaultFunctionsByRole[dappCoreRole].push("addAddressToRank");
         defaultFunctionsByRole[dappCoreRole].push("removeRankedAddress");  
         return true; 
