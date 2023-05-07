@@ -4,20 +4,11 @@ pragma solidity ^0.8.14;
 /**
  * @dev IOpenRanking is about ranking addresses of interest. 
  */
-// import "https://github.com/Block-Star-Logic/open-roles/blob/732f4f476d87bece7e53bd0873076771e90da7d5/blockchain_ethereum/solidity/v2/contracts/interfaces/IOpenRolesManaged.sol";
-import "../../../../../../Block-Star-Logic/open-roles/blockchain_ethereum/solidity/v2/contracts/interfaces/IOpenRolesManaged.sol";
-
-// import "https://github.com/Block-Star-Logic/open-roles/blob/732f4f476d87bece7e53bd0873076771e90da7d5/blockchain_ethereum/solidity/v2/contracts/core/OpenRolesSecureCore.sol";
-import "../../../../../../Block-Star-Logic/open-roles/blockchain_ethereum/solidity/v2/contracts/core/OpenRolesSecureCore.sol";
-
-// import "https://github.com/Block-Star-Logic/open-register/blob/03fb07e69bfdfaa6a396a063988034de65bdab3d/blockchain_ethereum/solidity/V1/interfaces/IOpenRegister.sol";
-import "../../../../../../Block-Star-Logic/open-register/blockchain_ethereum/solidity/V1/interfaces/IOpenRegister.sol";
-
-// import "https://github.com/Block-Star-Logic/open-ranking/blob/0e468d4680147bbb71c01bdeae1e799d96ff62db/blockchain_ethereum/solidity/V1/interfaces/IOpenRanking.sol";
-import "../../../../../../Block-Star-Logic/open-ranking/blockchain_ethereum/solidity/V1/interfaces/IOpenRanking.sol";
-
-// import "https://github.com/Block-Star-Logic/open-ranking/blob/7c619870350c6c77db6603e88da7749bf9ea455f/blockchain_ethereum/solidity/V1/libraries/LRankingUtilities.sol";
-import "../../../../../../Block-Star-Logic/open-ranking/blockchain_ethereum/solidity/V1/libraries/LRankingUtilities.sol";
+import "https://github.com/Block-Star-Logic/open-roles/blob/732f4f476d87bece7e53bd0873076771e90da7d5/blockchain_ethereum/solidity/v2/contracts/interfaces/IOpenRolesManaged.sol";
+import "https://github.com/Block-Star-Logic/open-roles/blob/732f4f476d87bece7e53bd0873076771e90da7d5/blockchain_ethereum/solidity/v2/contracts/core/OpenRolesSecureCore.sol";
+import "https://github.com/Block-Star-Logic/open-register/blob/03fb07e69bfdfaa6a396a063988034de65bdab3d/blockchain_ethereum/solidity/V1/interfaces/IOpenRegister.sol";
+import "https://github.com/Block-Star-Logic/open-ranking/blob/0e468d4680147bbb71c01bdeae1e799d96ff62db/blockchain_ethereum/solidity/V1/interfaces/IOpenRanking.sol";
+import "https://github.com/Block-Star-Logic/open-ranking/blob/7c619870350c6c77db6603e88da7749bf9ea455f/blockchain_ethereum/solidity/V1/libraries/LRankingUtilities.sol";
 
 contract OpenRanking is IOpenRanking, OpenRolesSecureCore, IOpenVersion,  IOpenRolesManaged {
 
@@ -25,7 +16,7 @@ contract OpenRanking is IOpenRanking, OpenRolesSecureCore, IOpenVersion,  IOpenR
     using LOpenUtilities for address; 
 
     string name                         = "RESERVED_OPEN_RANKING_CORE"; 
-    uint256 version                     = 11; 
+    uint256 version                     = 12; 
 
     string registerCA                   = "RESERVED_OPEN_REGISTER_CORE";
     string roleManagerCA                = "RESERVED_OPEN_ROLES_CORE";
